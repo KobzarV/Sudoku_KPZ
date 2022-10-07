@@ -4,7 +4,9 @@ using namespace std;
 
 const int SIZE = 9;
 int sudoku[SIZE][SIZE];
+int ansfer_sudoku[SIZE][SIZE];
 int test_array[SIZE * SIZE][SIZE] = { 0 };
+int easy = 2, medium = 39, hard = 45;
 
 bool checkrow(int, int);
 bool checkcol(int, int);
@@ -13,8 +15,9 @@ bool test(int, int);
 bool CheckRepeated(int i, int j);
 void moveback(int& i, int& j);
 void write(int i, int j);
-void print();
+void print(int arr[SIZE][SIZE]);
 void hide(int x, int y, int col_hide);
+void start(int level);
 
 int main()
 {
@@ -30,7 +33,8 @@ int main()
                 if (!test(i, j))
                     moveback(i, j);
 
-                sudoku[i][j] = rand() % 9 + 1;
+                ansfer_sudoku[i][j] = rand() % 9 + 1;
+                sudoku[i][j] = ansfer_sudoku[i][j];
 
                 if (CheckRepeated(i, j))
                     continue;
@@ -41,11 +45,47 @@ int main()
             }
         }
     }
+    print(ansfer_sudoku);
+    start(easy);
+    int user_i, user_j, user_num;
+    
+    while (easy != 0)
+    {
+        for (i = 0; i < 9; i++)
+        {
+            for (j = 0; j < 9; j++)
+            {
+                while (true)
+                {
+                    cout << "Enter coordinates" << endl;
+                    cout << "I - "; cin >> user_i;
+                    cout << "J - "; cin >> user_j;
+                    if (sudoku[user_i][user_j] != 0)
+                    {
+                        continue;
+                    }
+                    cout << "Enter your number - "; cin >> user_num;
+                    sudoku[user_i][user_j] = user_num;
 
-    print();
-
+                    if (ansfer_sudoku[user_i][user_j] == sudoku[user_i][user_j])
+                    {
+                        easy--;
+                        print(sudoku);
+                        break;
+                    }
+                    else
+                    {
+                        cout << "Error" << endl;
+                        sudoku[user_i][user_j] = 0;
+                        print(sudoku);
+                    }
+                }
+                if (easy == 0) { break; }
+            }
+            if (easy == 0) { break; }
+        }
+    }
     return 0;
-
 }
 
 bool checkrow(int x, int y)
@@ -127,7 +167,7 @@ void write(int i, int j)
     test_array[current][value] = 1;
 }
 
-void print()
+void print( int arr[SIZE][SIZE])
 {
     int i, j;
 
@@ -140,7 +180,30 @@ void print()
 
         for (j = 0; j < 9; j++)
         {
-            hide(i, j, 30);
+            cout << arr[i][j] << " ";
+            if ((j + 1) % 3 == 0)
+                cout << "| ";
+        }
+
+        cout << endl;
+    }
+    cout << "=========================\n";
+}
+
+void start(int level)
+{
+    int i, j;
+
+    for (i = 0; i < 9; i++)
+    {
+        if (i % 3 == 0)
+            cout << "=========================\n";
+
+        cout << "| ";
+
+        for (j = 0; j < 9; j++)
+        {
+            hide(i, j, level-1);
             cout << sudoku[i][j] << " ";
             if ((j + 1) % 3 == 0)
                 cout << "| ";
@@ -155,8 +218,6 @@ void hide(int x, int y, int col_hide)
 {
     int hide_i, hide_j, count = 0;
     srand(time(0));
-    /*hide_i = rand() % 9 + 1;
-    hide_j = rand() % 9 + 1;*/
     for (int i = 0; i < 9 ; i++)
     {
         for (int j = 0; ; j++)
